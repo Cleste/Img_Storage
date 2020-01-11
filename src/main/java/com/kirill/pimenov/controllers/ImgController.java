@@ -1,6 +1,8 @@
 package com.kirill.pimenov.controllers;
 
-import com.kirill.pimenov.domain.GetUrl;
+import com.kirill.pimenov.domain.GetUri;
+import com.kirill.pimenov.exceptions.ImageNotFoundException;
+import com.kirill.pimenov.exceptions.InvalidRequestException;
 import com.kirill.pimenov.exceptions.InvalidUrlException;
 import com.kirill.pimenov.services.ImgService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,19 +28,19 @@ public class ImgController {
     }
 
     @GetMapping("/preview/{name}")
-    public ResponseEntity<?> getSmallImg(@PathVariable("name") String name) {
+    public ResponseEntity<?> getPreviewImg(@PathVariable("name") String name) {
         return loadImg(name, "preview");
     }
 
     @PostMapping("/byUrl")
     public ResponseEntity<?> addImg(@RequestBody List<String> urls) {
-        List<GetUrl> getUrls = new ArrayList<>();
+        List<GetUri> getUris = new ArrayList<>();
         for (String url : urls) {
-            GetUrl getUrl = saveImg(url);
-            getUrls.add(getUrl);
+            GetUri getUri = saveImg(url);
+            getUris.add(getUri);
         }
-        if (!getUrls.isEmpty())
-            return ResponseEntity.ok().body(getUrls);
+        if (!getUris.isEmpty())
+            return ResponseEntity.ok().body(getUris);
         else return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Enter picture's URLs");
     }
 
@@ -48,16 +50,23 @@ public class ImgController {
         } catch (IOException e) {
             return new ResponseEntity<>("Error reading image!",
                     HttpStatus.BAD_REQUEST);
+        } catch (ImageNotFoundException e) {
+            return new ResponseEntity<>("Invalid image name - " + name,
+                    HttpStatus.BAD_REQUEST);
+        } catch (InvalidRequestException e) {
+            return new ResponseEntity<>("Invalid request - " + name,
+                    HttpStatus.BAD_REQUEST);
         }
+
     }
 
-    private GetUrl saveImg(String url) {
+    private GetUri saveImg(String url) {
         try {
             return imgService.saveImg(url);
         } catch (InvalidUrlException e) {
-            return new GetUrl("Invalid URL - " + url);
+            return new GetUri("Invalid URL - " + url);
         } catch (IOException e) {
-            return new GetUrl("Error loading image - " + url);
+            return new GetUri("Error loading image - " + url);
         }
     }
 }

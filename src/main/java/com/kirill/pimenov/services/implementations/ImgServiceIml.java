@@ -1,8 +1,9 @@
 package com.kirill.pimenov.services.implementations;
 
-import com.kirill.pimenov.domain.GetUrl;
+import com.kirill.pimenov.domain.GetUri;
 import com.kirill.pimenov.domain.Image;
 import com.kirill.pimenov.exceptions.ImageNotFoundException;
+import com.kirill.pimenov.exceptions.InvalidRequestException;
 import com.kirill.pimenov.exceptions.InvalidUrlException;
 import com.kirill.pimenov.repositories.ImageRepository;
 import com.kirill.pimenov.services.ImgService;
@@ -36,46 +37,57 @@ public class ImgServiceIml implements ImgService {
     @Value("${upload.path}")
     private String uploadPath;
 
+
     @Override
-    public ResponseEntity<InputStreamResource> loadImg(String name, String uploadPath) throws IOException, ImageNotFoundException {
+    public ResponseEntity<InputStreamResource> loadImg(String name, String uploadPath)
+            throws IOException, ImageNotFoundException, InvalidRequestException {
+
         if (uploadPath == null)
             uploadPath = this.uploadPath;
         else
             uploadPath = this.uploadPath + uploadPath;
+
+
         if (name != null && !name.isEmpty()) {
             Image image = imageRepository
                     .findByName(name);
             if (image != null && !image.getName().isEmpty()) {
+                //Converting file to resource
                 File img = new File(uploadPath + "/" + image.getName());
                 InputStreamResource resource = new InputStreamResource(new FileInputStream(img));
                 MediaType mediaType = MediaType.parseMediaType(servletContext.getMimeType(img.getName()));
+
                 return ResponseEntity.ok()
                         .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + img.getName())
                         .contentType(mediaType)
                         .contentLength(img.length())
                         .body(resource);
-            } else throw new InvalidUrlException();
-        } else throw new ImageNotFoundException();
+
+            } else throw new ImageNotFoundException();
+        } else throw new InvalidRequestException();
     }
 
-    public GetUrl saveImg(String url)
+    public GetUri saveImg(String url)
             throws InvalidUrlException, IOException {
+
         if (url != null && !url.isEmpty()) {
+
             String fileExtension = getFileExtension(url);
+
             if (fileExtension != null && (fileExtension.contains("png") || fileExtension.contains("jpeg") || fileExtension.contains("jpg"))) {
                 String fileName = UUID.randomUUID().toString() + "." + fileExtension;
-                downloadImg(url, fileName, 100);
+                downloadImg(url, fileName, 2048);
                 makeSmallImage(new File(uploadPath + fileName));
                 Image image = new Image(fileName);
-                GetUrl getUrl = new GetUrl();
-                getUrl.setOriginal(ServletUriComponentsBuilder.fromCurrentContextPath()
+                GetUri getUri = new GetUri();
+                getUri.setOriginal(ServletUriComponentsBuilder.fromCurrentContextPath()
                         .path("img/" + fileName)
                         .toUriString());
-                getUrl.setPreview(ServletUriComponentsBuilder.fromCurrentContextPath()
+                getUri.setPreview(ServletUriComponentsBuilder.fromCurrentContextPath()
                         .path("img/preview/" + fileName)
                         .toUriString());
                 imageRepository.save(image);
-                return getUrl;
+                return getUri;
             } else throw new InvalidUrlException();
         } else throw new InvalidUrlException();
     }

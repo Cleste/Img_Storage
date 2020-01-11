@@ -13,7 +13,6 @@ import java.util.UUID;
 @Entity
 @Table(name = "images")
 public class Image {
-
     @Id
     private String name;
 

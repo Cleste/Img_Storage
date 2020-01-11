@@ -3,13 +3,13 @@ package com.kirill.pimenov.domain;
 import lombok.Data;
 
 @Data
-public class GetUrl {
+public class GetUri {
     private String preview;
     private String original;
     private String error = null;
-    public GetUrl(String error) {
+    public GetUri(String error) {
         this.error = error;
     }
-    public GetUrl(){
+    public GetUri(){
     }
 }
