@@ -2,7 +2,7 @@
 1. Скачайте репозиторий в удобную для Вас директорию. 
 2. Распакуйте его.
 3. Укажите данные директории, в которой вы распаковали архив, в файле application.properties:
-upload.path = {DirPath}/testTask/img_uploads/ - где, DirPath это путь к вашей дириктории
+upload.path = {DirPath}/ImgStorage/img_uploads/ - где, DirPath это путь к вашей дириктории
 4. Создайте базу данных PostgreSQL.
 5. Укажите данные своей БД в файле application.properties:
 spring.datasource.url - host вашей БД
@@ -27,5 +27,5 @@ spring.datasource.url - host вашей БД
 spring.datasource.username - username для подключения к БД
 spring.datasource.password - password для подключения к БД
 3. Укажите данные директории, в которой вы распаковали архив, в файле application-test.properties:
-upload.path = {DirPath}/testTask/img_uploads/ - где, DirPath это путь к вашей дириктории
+upload.path = {DirPath}/ImgStorage/img_uploads/ - где, DirPath это путь к вашей дириктории
 4. Запустите тесты.
