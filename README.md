@@ -23,7 +23,9 @@ POST - http://localhost:8080/img/byUrl
 		]
 		
 8. Картинки будут храниться в папках img_uploads и img_uploads/preview.
+
 	Инструкция по работе с тестами:
+	
 1. Создайте отдельную базу данных PostgreSQL для тестов.
 2. Укажите данные своей БД в файле application-test.properties:
 spring.datasource.url - host вашей БД
